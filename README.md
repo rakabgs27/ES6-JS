@@ -1,50 +1,98 @@
-# 01 - let
+# 05 - Function as First Class Citizen
 
-# Apa itu "let" di JavaScript
+# Penjelasan Singkat Tentang Function as First Class Citizen
 
-Di JavaScript, let adalah kata kunci yang digunakan untuk mendeklarasikan variabel dengan lingkup blok. Ketika Anda menggunakan let untuk mendeklarasikan variabel, variabel tersebut hanya dapat diakses di dalam blok di mana variabel tersebut dideklarasikan. Sebuah blok adalah setiap rangkaian pernyataan yang terdapat dalam kurung kurawal {}. Berikut adalah contohnya:
+Dalam berbagai literature dikatakan bahwa Javascript adalah bahasa pemograman yang mendukung first-class function. Sebenarnya apa sih first-class function itu? Dalam ilmu computer, Bahasa pemograman dapat dikatakan mendukung first-class function apabila memberlakukan function sebagai first-class object. First-class object itu sendiri adalah sebuah entitas (bisa berbentuk function, atau variable) yang dapat dioperasikan dengan cara yang sama seperti entitas lain. Operasi tersebut biasanya mencakup passing entitas sebagai argument, return entitas dari sebuah function, dan assign entitas kedalam variable, object atau array. Apabila dikaitkan dengan javascript, intinya function pada javascript adalah first-class object, Yang berarti function tersebut dapat:
+
+- Di assign ke dalam variable, object, atau array
+- Di passing sebagai argument pada function lain
+- Di return dari sebuah function
+
+# Assign a function
 ```
-function foo() {
-    let x = 10; // x hanya dapat diakses dalam blok ini
-    if (true) {
-        let y = 20; // y hanya dapat diakses dalam blok ini
-        console.log(x); // 10
-        console.log(y); // 20
-    }
-    console.log(x); // 10
-    console.log(y); // ReferenceError: y tidak didefinisikan
+// 1. Assign ke dalam variable : 
+let fn = function doSomething() {
+  console.log('Hallo')
 }
-    foo();
+fn() // Hallo
+
+// 2. Assign ke dalam object : 
+let obj = { 
+  doSomething : function doSomething()
+  {
+    console.log('Hallo')
+  }
+}
+obj.doSomething() // Hallo
+
+//3. Assign ke dalam array : 
+let arr = []
+arr.push(function doSomething() 
+  {
+    console.log('Hallo')     
+  }
+)
+arr[0]() // Hallo
 ```    
-Pada contoh ini, variabel x dideklarasikan dengan let di dalam blok fungsi dan dapat diakses dalam seluruh fungsi. Variabel y juga dideklarasikan dengan let, tetapi di dalam blok if, sehingga hanya dapat diakses dalam blok tersebut. Jika Anda mencoba mengakses y di luar blok di mana variabel itu dideklarasikan, maka akan muncul ReferenceError.
+Kita bisa assign anonymous function (function tanpa nama) kedalam variabel, object atau array dimana isi function tersebut dapat di return apabila ditambahkan tanda kurung () di bagian akhir sewaktu proses invocation (pemanggilan).
 
-# Bagaimana cara menggunakan Let yang benar?
-Untuk menggunakan let dengan benar di JavaScript, ikuti langkah-langkah berikut:
+Apabila function di beri nama seperti contoh diatas, sebenarnya tidak ada masalah, akan tetapi kalian hanya bisa menggunakan nama variabel untuk melakukan proses invocation, bukan menggunakan nama function. Sebagian programmer memberi nama sebuah function pada contoh diatas untuk mempermudah ketika men-debug kode.
 
-1. Deklarasikan variabel dengan kata kunci let, diikuti dengan nama variabel yang diinginkan, dan berikan nilai awal jika diperlukan. "let myVariable = 10;"
-2. Gunakan variabel tersebut sesuai kebutuhan di dalam blok yang sesuai. Pastikan untuk menghindari penggunaan variabel yang sama di luar blok.
+# Pass a function as an argument
 ```
-function myFunction() {
-    let myVariable = 20;
-    console.log(myVariable); // Output: 20
+function sayHello() {
+  return "Hello, ";
 }
-```
-3.Jangan mendeklarasikan variabel yang sama dengan nama yang sama di dalam blok yang sama atau blok yang lebih dalam.
-```
-function myFunction() {
-    let myVariable = 20;
-    if (true) {
-        let myVariable = 30; // Ini merupakan variabel yang berbeda dari yang di atas.
-        console.log(myVariable); // Output: 30
-    }
-    console.log(myVariable); // Output: 20
+function greeting(helloMessage, name) {
+  console.log(helloMessage() + name);
 }
+// Pass `sayHello` as an argument to `greeting` function
+greeting(sayHello, "JavaScript!");
+// Hello, Javascript!
 ```
-4.Hindari penggunaan variabel tanpa deklarasi atau variabel yang dideklarasikan dengan let yang sama di dalam blok.
+Disini kita mempassing function sayHello() kedalam function greeting() sebagai argument. ini menjelaskan bagaimana kita memberlakukan function sayHello() tersebut sebagai value dari function greeting().
+
+# Return a function as results
 ```
-function myFunction() {
-    myVariable = 20; // Ini akan membuat variabel global, hindari penggunaan variabel tanpa deklarasi.
-    let myVariable = 30; // Ini akan menghasilkan ReferenceError, hindari penggunaan variabel yang sama di dalam blok.
+function sayHello() {
+  return function() {
+  console.log("Hello!");
+  }
 }
+
+sayHello()();
+// Hello
 ```
-Dengan mengikuti langkah-langkah di atas, Anda dapat menggunakan let dengan benar di JavaScript. Hal ini akan membantu Anda menghindari kesalahan dalam penggunaan variabel dan memastikan bahwa variabel Anda memiliki lingkup blok yang sesuai.
+Di contoh ini, kita me-return sebuah function dari function lain. Function yang me-return function lain dinamakan Higher-Order Function. Apabila dikaitkan dengan contoh diatas, maka function sayHello() itu dinamakan Higher-Order Function atau function yang memiliki kedudukan tertinggi karena bisa me-return function lain.
+
+# Contoh Lain Untuk Code
+```
+// Mendefinisikan sebuah fungsi sebagai variabel
+const add = function(a, b) {
+  return a + b;
+}
+
+// Menyimpan sebuah fungsi sebagai nilai properti dalam objek
+const person = {
+  name: "John",
+  age: 30,
+  getGreeting: function() {
+    return `Hello, my name is ${this.name} and I'm ${this.age} years old.`;
+  }
+};
+
+// Mengirim sebuah fungsi sebagai argumen ke dalam fungsi lainnya
+function doOperation(a, b, operation) {
+  return operation(a, b);
+}
+const sum = doOperation(2, 3, add); // Memanggil fungsi "add" dari dalam fungsi "doOperation"
+
+// Mengembalikan sebuah fungsi dari dalam sebuah fungsi
+function createAdder(x) {
+  return function(y) {
+    return x + y;
+  }
+}
+const addFive = createAdder(5);
+const result = addFive(10); // Menghasilkan nilai 15
+```
